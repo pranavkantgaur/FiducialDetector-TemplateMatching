@@ -3,6 +3,7 @@
 */
 void FiducialDetector::configure()
 {
+	// read project configuration file and initialize detector state
 }
 
 
@@ -13,10 +14,9 @@ void FiducialDetector::run()
 {
 	if (detectorConfigured == true)
 	{
-		generateTrainingData();
-		generateFiducialTemplates();
-		generateFiducialCandidates();
-		matchTemplatesWithCandidates();
+		scts.generateFiducialTemplates();
+		mmfs.generateFiducialCandidates();
+		itr.matchTemplatesWithCandidates();
 	}
 	else
 	{

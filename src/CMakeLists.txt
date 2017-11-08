@@ -1,0 +1,6 @@
+add_executable (fiducial_detector SpectralClusteringFiducialTemaplateSelection.cxx MAPMARFiducialCandidateSelection.cxx ICPTemplateRegistration.cxx FiducialDetector.cxx)
+
+
+
+
+
