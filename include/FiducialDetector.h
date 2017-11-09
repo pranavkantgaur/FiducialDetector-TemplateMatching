@@ -1,4 +1,9 @@
 #include <itkDOMNodeXMLReader.h>
+#include <itkImage.h>
+#include <itkGDCMImageIO.h>
+#include <itkGDCMFileSeriesReader.h>
+#include <itkImageFileWriter.h>
+
 
 #include "SpectralClusteringTemplateSelection.h"
 #include "MAPMARCandidateSelection.h"

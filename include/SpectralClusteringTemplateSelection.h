@@ -3,10 +3,12 @@
 */
 class SpectralClusteringTemplateSelection{
 	private:
-		computeFiducialOrientations();
-		computeSimilarityMatrix();
-		computeEigenVectors();
-		computeKmeansClustering();
+		void computeFiducialOrientations();
+		void computeSimilarityMatrix();
+		void computeEigenVectors();
+		void computeKmeansClustering();
+		void generateFiducialTemplates();		
+
 	protected:
-		generateFiducialTemplates();		
+		void generateTrainingData();
 };

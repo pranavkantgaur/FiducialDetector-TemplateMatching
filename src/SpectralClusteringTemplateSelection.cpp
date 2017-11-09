@@ -4,7 +4,7 @@
 void FiducialDetector::generateTrainingData()
 {
 	// read DICOM images
-			
+				
 	// compute orientation of each training data fiducial
 	
 }
