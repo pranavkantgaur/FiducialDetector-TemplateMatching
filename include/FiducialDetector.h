@@ -1,6 +1,11 @@
+#include <itkDOMNodeXMLReader.h>
+
 #include "SpectralClusteringTemplateSelection.h"
 #include "MAPMARCandidateSelection.h"
 #include "ICPTemplateRegistration.h"
+
+using namespace std;
+using namespace itk;
 
 class FiducialDetector{
 	
