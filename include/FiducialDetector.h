@@ -3,7 +3,7 @@
 #include <itkGDCMImageIO.h>
 #include <itkGDCMFileSeriesReader.h>
 #include <itkImageFileWriter.h>
-
+#include <itkNrrdImageIOFactory.h>
 
 #include "SpectralClusteringTemplateSelection.h"
 #include "MAPMARCandidateSelection.h"
