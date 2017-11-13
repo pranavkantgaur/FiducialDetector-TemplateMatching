@@ -4,6 +4,10 @@
 #include <itkGDCMFileSeriesReader.h>
 #include <itkImageFileWriter.h>
 #include <itkNrrdImageIOFactory.h>
+#include <itkLabelGeometryImageFilter.h>
+
+
+
 
 #include "SpectralClusteringTemplateSelection.h"
 #include "MAPMARCandidateSelection.h"
@@ -15,12 +19,13 @@ using namespace itk;
 class FiducialDetector{
 	
 	private:
+		bool detectorConfigured;
 		SpectralClusteringTemplateSelection scts;
 		MAPMARFiducialCandidateSelection mmfcs;
 		ICPTemplateRegistration itr;
 	public:
-		configure(); // reads a config file defjning the project configuration
-		run(); 		
+		configure(); 
+		run();
 };
 
 

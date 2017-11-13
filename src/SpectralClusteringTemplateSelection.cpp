@@ -1,7 +1,7 @@
 /* void FiducialDetector::readTrainingData()
  * \brief reads contoured fiducial samples, computes orientation of each sanple
  */
-void FiducialDetector::generateTrainingData()
+void SpectralClusteringTemplateSelection::generateTrainingData()
 {
 	// read DICOM images
 	typedef signed short PixelType;
@@ -58,18 +58,39 @@ void FiducialDetector::generateTrainingData()
 		return EXIT_FAILURE;
 	}				
 	// compute orientation of each training data fiducial
-	
+	// training data in: reader->GetOutput()
+		
 }
+
+void computeSimilarityMatrix()
+{
+}
+
+void computeKEigenVectors()
+{
+}
+
+void computeKMeansClustering()
+{
+}
+
+
 
 /* void FiducialDetector::generateTemplates()
  * \brief generates templates modeling fiducials from training data
 */
-void FiducialDetector::generateFiducialTemplates()
+void SpectralClusteringTemplateSelection::generateFiducialTemplates()
 {	
+	generateTrainingData();
+	
 	// spectral clustering in orientation space
 		// compute similarity matrix between contoured fiducials over their orientations
 		// compute first k eigenvectors , build matrix U
 		// Perform k-means clustering on U 
 		// return k-disjoint clusters
+	computeSimilarityMatrix();
+	computeKEigenVectors();
+	computeKMeansClustering(); // returns disjoing clusters
+	return;
 }
 
