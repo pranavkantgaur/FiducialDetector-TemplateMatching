@@ -1,24 +1,29 @@
 /*! void FiducialDetector::configure()
  *  \brief Reads project configuration file and initializes internal parameters.
 */
-void FiducialDetector::configure()
+#include "FiducialDetection.h"
+
+
+
+
+void FiducialDetection::configure(std::string fileName)
 {
 	// read project configuration file and initialize detector state
-	itk::DOMNode::Pointer putput_dom_object;
+	itk::DOMNode::Pointer output_dom_object;
 	itk::DOMNodeXMLReader::Pointer reader = DOMNodeXMLReader::New();
-	reader->SetFileName();
+	reader->SetFileName(fileName);
 	reader->Update();
 	output_dom_object = reader->GetOutput();
 
 	// dir location: training images
-	std::string trainingDatasetDir = output_dom_object->find("trainingDatasetDir"); // TODO check	
+	itk::DOMNode::Pointer trainingDatasetDir = output_dom_object->Find("trainingDatasetDir"); // TODO check	
 	// dir location for test images
-	std::string testingDatasetDir = output_dom_object->find("testDatasetDir");
+	itk::DOMNode::Pointer testingDatasetDir = output_dom_object->Find("testDatasetDir");
 
 	 // % of variation as a therehold for selecting k 
-	size_t percentVariationEigenVectors = output_dom_object->find("percentVariationEigenVectors");
+	itk::DOMNode::Pointer percentVariationEigenVectors = output_dom_object->Find("percentVariationEigenVectors");
  	// number of gaussian distributions
-	size_t nGaussians = output_dom_object->find("nGaussians");
+	itk::DOMNode::Pointer nGaussians = output_dom_object->Find("nGaussians");
 	
 	// parameters for icp template registration parameters
 	detectorConfigured = true;
@@ -28,19 +33,18 @@ void FiducialDetector::configure()
 /* void FiducialDetector::run()
  * \brief Public interface for running the system
  */
-int FiducialDetection::run()
+void FiducialDetection::run()
 {
 	if (detectorConfigured == true)
 	{
-		scts.generateFiducialTemplates();
-//		mmfs.generateFiducialCandidates();
-//		itr.matchTemplatesWithCandidates();
-	}
+/*		scts.generateFiducialTemplates();
+		mmfs.generateFiducialCandidates();
+		itr.matchTemplatesWithCandidates();
+*/	}
 	else
 	{
 		cout << "Please configure the detector!!";
-		exit();
+		exit(1);
 	}
-	return 0;
 }
 
