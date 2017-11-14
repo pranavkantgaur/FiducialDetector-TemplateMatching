@@ -10,5 +10,5 @@ class SpectralClusteringTemplateSelection{
 		void generateFiducialTemplates();		
 
 	protected:
-		void generateTrainingData();
+		void generateTrainingData(std::string, float);
 };

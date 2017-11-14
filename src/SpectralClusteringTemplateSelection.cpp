@@ -1,7 +1,7 @@
 /* void FiducialDetector::readTrainingData()
  * \brief reads contoured fiducial samples, computes orientation of each sanple
  */
-void SpectralClusteringTemplateSelection::generateTrainingData()
+void SpectralClusteringTemplateSelection::generateTrainingData(std::string trainingDatasetDir, float nGaussians)
 {
 	// read DICOM images
 	typedef signed short PixelType;
