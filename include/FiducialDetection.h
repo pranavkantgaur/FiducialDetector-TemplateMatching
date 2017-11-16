@@ -9,9 +9,9 @@
 
 
 
-#include "SpectralClusteringTemplateSelection.h"
-#include "MAPMARCandidateSelection.h"
-#include "ICPTemplateRegistration.h"
+//#include "SpectralClusteringTemplateSelection.h"
+//#include "MAPMARCandidateSelection.h"
+//#include "ICPTemplateRegistration.h"
 
 using namespace std;
 using namespace itk;
@@ -23,7 +23,7 @@ class FiducialDetection{
 		std::string trainingDatasetDir;
 		std::string testDatasetDir;
 		size_t nGaussians;
-		float percentConfidenceEigenVectors;
+		float percentVariationEigenVectors;
 /*		SpectralClusteringTemplateSelection scts;
 		MAPMARFiducialCandidateSelection mmfcs;
 		ICPTemplateRegistration itr;

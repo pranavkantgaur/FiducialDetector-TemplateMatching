@@ -57,17 +57,46 @@ void SpectralClusteringTemplateSelection::generateTrainingData(std::string train
 		cout << ex << endl;
 		return EXIT_FAILURE;
 	}				
-	// compute orientation of each training data fiducial
-	// training data in: reader->GetOutput()
+	
+	
+	FiducialOrientation fOrientVector;
+	for (unsigned int sID = 0; sID < nTrainingSamples; sID++)
+		for (unsigned int fID = 0; fID < nFiducialsPerSample; fID++)
+		{
+			fOrientVector.alpha = ;
+			fOrientVector.beta = ;
+			fOrientVector.gamma = ;
+			fiducialOrientationVectors.push(fOrientVector);
+		}
 		
 }
 
 void computeSimilarityMatrix()
 {
+	simMatrixSize = fiducialOrientationVectors.size();
+	similarityMatrix = new vector(simMatrixSize, vector<float>(simMatrixSize)>);
+	for (unsigned int row = 0; row < simMatrixSize; row++)
+		for (unsigned int col = 0; col < simMatrixSize; col++)
+			similarityMatrix[][] = fabs() + fabs() + fabs();		 
 }
 
 void computeKEigenVectors()
 {
+	// compute U matrix
+	// U =  first k eigen vectors of (D-1/2)W(D+1/2), D=diag(simMatrix)
+	vector<vector<float> > DMatrix;
+	DMatrix = similarityMatrix;
+	DMatrix.erase();
+	// zero out all elements except diagonals
+	unsigned int similarityMatrixSize = fiducialOrientationVectors.size();
+	for (unsigned int row = 0; row < similarityMatrixSize; row++)
+		for (unsigned int col = 0; col < similarityMatrixSize; col++)
+		{
+			if (row == col)
+				DMatrix[row][col] = similarityMatrix[row][col];
+		}
+	// D-1/2WD+1/2 TODO
+	Dmatrix
 }
 
 void computeKMeansClustering()

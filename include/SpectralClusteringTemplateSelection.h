@@ -3,6 +3,15 @@
 */
 class SpectralClusteringTemplateSelection{
 	private:
+		class FiducialOrientation{
+			float alpha;
+			float beta;
+			float gamma;
+		};
+		vector<FiducialOrientation> fiducialOrientationVectors;
+		vector<vector<float> > similarityMatrix;
+		unsigned int similarityMatrixSize;
+		vector<vector<float> > UMatrix;
 		void computeFiducialOrientations();
 		void computeSimilarityMatrix();
 		void computeEigenVectors();
