@@ -3,7 +3,7 @@
 */
 class SpectralClusteringTemplateSelection{
 	private:
-		class FiducialOrientation{
+		struct FiducialOrientation{
 			float alpha;
 			float beta;
 			float gamma;

@@ -17,24 +17,23 @@ void FiducialDetection::configure(std::string fileName)
 	itk::DOMNode::Pointer trainingDatasetDirDOMNode = output_dom_object->Find("training_dataset_dir"); 
 	itk::DOMTextNode::Pointer textNodePtr = trainingDatasetDirDOMNode->GetTextChild();
 	
-	cout << "Training dataset dir: " << textNodePtr->GetText() << endl;
+	trainingDatasetDir = textNodePtr->GetText();
 	// dir location for test images
 	itk::DOMNode::Pointer testingDatasetDirDOMNode = output_dom_object->Find("test_dataset_dir");
 	textNodePtr = testingDatasetDirDOMNode->GetTextChild();
-	cout << "Test dataset dir: " << textNodePtr->GetText() << endl;
+	testDatasetDir = textNodePtr->GetText();
 
 	 // % of variation as a therehold for selecting k 
 	itk::DOMNode::Pointer percentVariationEigenVectorsDOMNode = output_dom_object->Find("percent_variation_eigen_vectors");
  	textNodePtr = percentVariationEigenVectorsDOMNode->GetTextChild();
-	cout << "Percent variation for eigen vectors: " << textNodePtr->GetText() << endl;
-
-
+	percentVariationEigenVectors = stof(textNodePtr->GetText());
+	cout << "Percent variation for Eigen vector selection: " << percentVariationEigenVectors << endl;
 
 	// number of gaussian distributions
 	itk::DOMNode::Pointer nGaussiansDOMNode = output_dom_object->Find("nGaussians");
 	textNodePtr = nGaussiansDOMNode->GetTextChild();
-	cout << "nGaussians: " << textNodePtr->GetText() << endl;
-
+	nGaussians = stoi(textNodePtr->GetText());
+	cout << "Number of gaussians: " << nGaussians << endl;
 	
 	// parameters for icp template registration parameters
 	detectorConfigured = true;

@@ -1,3 +1,5 @@
+#include <string>
+
 #include <itkDOMNodeXMLReader.h>
 #include <itkImage.h>
 #include <itkGDCMImageIO.h>
