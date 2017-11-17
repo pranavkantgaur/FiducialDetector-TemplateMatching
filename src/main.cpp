@@ -10,6 +10,6 @@ int main(int argc, char* argv[])
 	}
 	FiducialDetection detector;
 	detector.configure(argv[1]);
-//	detector.run();
+	detector.run();
 	return 0;
 }

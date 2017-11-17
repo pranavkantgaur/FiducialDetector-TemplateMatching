@@ -40,6 +40,80 @@ void FiducialDetection::configure(std::string fileName)
 }
 
 
+/* void FiducialDetector::readTrainingData()
+ * \brief reads contoured fiducial samples, computes orientation of each sanple
+ */
+void FiducialDetection::generateTrainingData()
+{
+	// read DICOM images
+	typedef signed short PixelType;
+	const unsigned int Dimension = 3;
+	typedef itk::Image<PixelType, Dimension> ImageType;
+	typedef itk::ImageSeriesReader<ImageType> ReaderType;
+	string dirName = "."; // initialization
+	// TODO set directory name from configuration data
+
+	typedef itk::GDCMSeriesFileNames NamesGeneratorType;
+	NamesGeneratorType::Pointer nameGenerator = NamesGeneratorType::New();
+	nameGenerator->SetUseSeriesDetails(true);
+	nameGenerator->AddSeriesRestriction("008|0021");
+	nameGenerator->SetGlobalWarningDisplay(false);
+	nameGenerator->SetDirectory(dirName);
+	try
+	{
+	typedef vector<string> SeriesIdContainer;
+	const SeriesIdContainer & seriesUID = nameGenerator->GetSeriesUIDs();
+	SeriesIdContainer::const_iterator seriesItr = seriesUID.begin();
+	SeriesIdContainer::const_iterator seriesEnd = seriesUID.end();
+	if (seriesItr != seriesEnd)
+	{
+		cout << "The directory: ";
+		cout << dirName << endl;
+		cout << "Contains the following DICOM series: " << endl;
+	}
+
+	while (seriesItr != seriesEnd)
+	{
+		cout << seriesItr->c_str() << endl;
+		++seriesItr;
+	}
+	seriesItr = seriesUID.begin();
+	while(seriesItr != seriesUID.end())
+	{
+		string seriesIdentifier;
+		seriesIdentifier = seriesItr->c_str();
+		seriesItr++;
+		cout << "Reading: ";
+		typedef std::vector<std::string> FileNamesContainer;
+		FileNamesContainer fileNames;
+		fileNames = nameGenerator->GetFileNames(seriesIdentifier);
+		ReaderType::Pointer reader = ReaderType::New();
+		typedef itk::GDCMImageIO ImageIOType;
+		ImageIOType::Pointer dicomIO = ImageIOType::New();
+		reader->SetImageIO(dicomIO);
+		reader->SetFileNames(fileNames);
+	}
+	}
+	catch (itk::ExceptionObject &ex)
+	{
+		cout << ex << endl;
+	}				
+	
+	
+	FiducialOrientation fOrientVector;
+/*	for (unsigned int sID = 0; sID < nTrainingSamples; sID++)
+		for (unsigned int fID = 0; fID < nFiducialsPerSample; fID++)
+		{
+			fOrientVector.alpha = ;
+			fOrientVector.beta = ;
+			fOrientVector.gamma = ;
+			fiducialOrientationVectors.push(fOrientVector);
+		}
+	*/	
+}
+
+
+
 /* void FiducialDetector::run()
  * \brief Public interface for running the system
  */
@@ -47,8 +121,9 @@ void FiducialDetection::run()
 {
 	if (detectorConfigured == true)
 	{
-/*		scts.generateFiducialTemplates(trainingDatasetDir, percentConfidenceEigenVectors);
-		mmfs.generateFiducialCandidates(nGaussians);
+		generateTrainingData();
+		scts.generateFiducialTemplates(percentVariationEigenVectors);
+/*		mmfs.generateFiducialCandidates(nGaussians);
 		itr.matchTemplatesWithCandidates(testDatasetDir;
 */	}
 	else
