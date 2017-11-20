@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 	<detector_configuration>
-		<training_dataset_dir>  "data/" </training_dataset_dir>
-		<test_dataset_dir> "data/" </test_dataset_dir>
+		<training_dataset_dir>../../data</training_dataset_dir>
+		<test_dataset_dir>../../data </test_dataset_dir>
 		<percent_variation_eigen_vectors> 98 </percent_variation_eigen_vectors>
 		<nGaussians> 8 </nGaussians>  
 	</detector_configuration>
