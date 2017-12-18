@@ -7,7 +7,7 @@
 #include <itkGDCMSeriesFileNames.h>
 #include <itkImageSeriesReader.h>
 #include <itkNrrdImageIOFactory.h>
-//#include <itkLabelGeometryImageFilter.h>
+#include <itkLabelGeometryImageFilter.h>
 
 
 

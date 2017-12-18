@@ -27,16 +27,22 @@ void FiducialDetection::configure(std::string fileName)
 	itk::DOMNode::Pointer percentVariationEigenVectorsDOMNode = output_dom_object->Find("percent_variation_eigen_vectors");
  	textNodePtr = percentVariationEigenVectorsDOMNode->GetTextChild();
 	percentVariationEigenVectors = stof(textNodePtr->GetText());
-	cout << "Percent variation for Eigen vector selection: " << percentVariationEigenVectors << endl;
-
+	
 	// number of gaussian distributions
 	itk::DOMNode::Pointer nGaussiansDOMNode = output_dom_object->Find("nGaussians");
 	textNodePtr = nGaussiansDOMNode->GetTextChild();
 	nGaussians = stoi(textNodePtr->GetText());
-	cout << "Number of gaussians: " << nGaussians << endl;
-	
+		
 	// parameters for icp template registration parameters
 	detectorConfigured = true;
+}
+
+/* \fn FiducialDetector::extractFiducialOrientation()
+ * \brief Extracts (alpha, beta, gamma) from input rotation matrix. Computes axis-angle representation from rotation matrix. Compute alpha, beta, gamma from axis-angle representation.
+ */
+void FiducialDetector::extractFiducialOrientation()
+{
+	//TODO
 }
 
 
@@ -54,8 +60,8 @@ void FiducialDetection::generateTrainingData()
 
 	typedef itk::GDCMSeriesFileNames NamesGeneratorType;
 	NamesGeneratorType::Pointer nameGenerator = NamesGeneratorType::New();
-	nameGenerator->SetUseSeriesDetails(true);
-	nameGenerator->AddSeriesRestriction("0008|0021");
+//	nameGenerator->SetUseSeriesDetails(true);
+//	nameGenerator->AddSeriesRestriction("0008|0021"); // means to refine based on series date
 	nameGenerator->SetGlobalWarningDisplay(false);
 	nameGenerator->SetDirectory(dirName);
 
@@ -87,7 +93,6 @@ void FiducialDetection::generateTrainingData()
 			string seriesIdentifier;
 			seriesIdentifier = seriesItr->c_str();
 			seriesItr++;
-			cout << "Reading: ";
 			typedef std::vector<std::string> FileNamesContainer;
 			FileNamesContainer fileNames;
 			fileNames = nameGenerator->GetFileNames(seriesIdentifier);
@@ -96,24 +101,34 @@ void FiducialDetection::generateTrainingData()
 			ImageIOType::Pointer dicomIO = ImageIOType::New();
 			reader->SetImageIO(dicomIO);
 			reader->SetFileNames(fileNames);
+			reader->Update(); // read the series of DICOM images				
+			ImageType::Pointer ptr = reader->GetOutput(); // DICOM output, all files			
+			cout << "Number of files in this series: " << fileNames.size() << endl;
+				
+			itk::Index<3> id = {40, 3, 20};
+			signed short pixelValue = ptr->GetPixel(id);
+			cout << pixelValue << endl;
+	
+			// write fiducial orientations as the training data for the approach TODO
+			itkImageLabelGeometryFilter fiducialOrientationEstimator;
+			FiducialOrientation fiducialOrientVector; // represents collection of orientation of all fiducials in a label volume
+			vnl_matrix<double> fiducialRotationMatrix; 
+			for (unsigned int fileID = 0; fileID < nFilesInSeries; fileID++)				    	
+				// compute orientation of data 
+				for (size_t labelIndex = 0; labelIndex < labelID; labelIndex++) // for all available labels in any file
+				{
+					rotationMatrix = fiducialOrientationEstimator.GetRotationMatrix(label);//TODO value of the label representing fiducials
+					this->extractOrientation(rotationMatrix, fOrientVector); // 'fOrientVector' now contains orientation information for the fiducial
+					fiducialOrientationVectors.push(fOrientVector); // insert orientation triplet for this fiducial into a global training array.
+				}		
 		}
 	}
+
 	catch (itk::ExceptionObject &ex)
 	{
 		cout << ex << endl;
 	}				
-	FiducialOrientation fOrientVector;
-/*	for (unsigned int sID = 0; sID < nTrainingSamples; sID++)
-		for (unsigned int fID = 0; fID < nFiducialsPerSample; fID++)
-		{
-			fOrientVector.alpha = ;
-			fOrientVector.beta = ;
-			fOrientVector.gamma = ;
-			fiducialOrientationVectors.push(fOrientVector);
-		}
-	*/	
 }
-
 
 
 /* void FiducialDetector::run()

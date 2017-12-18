@@ -1,14 +1,18 @@
 #include "SpectralClusteringTemplateSelection.h"
-/*
+
 void computeSimilarityMatrix()
 {
 	simMatrixSize = fiducialOrientationVectors.size();
 	similarityMatrix = new vector(simMatrixSize, vector<float>(simMatrixSize)>);
 	for (unsigned int row = 0; row < simMatrixSize; row++)
 		for (unsigned int col = 0; col < simMatrixSize; col++)
-			similarityMatrix[][] = fabs() + fabs() + fabs();		 
+		{
+			fiducialOneOrientationVector = fiducialOrientationVectors[row];
+			fiducialTwoOrientationVector = fiducialOrientationVectors[col];
+			similarityMatrix[row][col] = fabs(fiducialOneOrientationVector.alpha - fiducialTwoOrientatioVector.alpha) + fabs(fiducialOneOrientationVector.beta - fiducialTwoOrientatioVector.beta) + fabs(fiducialOneOrientationVector.gamma - fiducialTwoOrientationVector.gamma);		 
+		}
 }
-
+/*
 void computeKEigenVectors()
 {
 	// compute U matrix
@@ -45,8 +49,8 @@ void SpectralClusteringTemplateSelection::generateFiducialTemplates(float percen
  			compute first k eigenvectors , build matrix U
 			Perform k-means clustering on U 
 		return k-disjoint clusters */
-/*	computeSimilarityMatrix();
-	computeKEigenVectors();
+	computeSimilarityMatrix();
+/*	computeKEigenVectors();
 	computeKMeansClustering(); // returns disjoing clusters
 */
 }
