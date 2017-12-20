@@ -44,10 +44,11 @@ void FiducialDetection::configure(std::string fileName)
 */
 void FiducialDetector::extractFiducialOrientationVector(vnl_matrix<double>& rotationMatrix , vector<FiducialOrientation>& fiducialOrientationVector)
 {
-	// Reference: http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/
-	// Rotation matrix to Euler angle conversion
-	double x, y, z; 		
-	// TODO
+	// Reference: http://nghiaho.com/?page_id=846 
+	// Rotation matrix to Euler angle conversion, assumed rotation sequence YXZ, a.k.a Yaw-Pitch-Roll
+	fiducialOrientationVector.alpha = atan2(rotationMatrix(2, 1), rotationMatrix(2, 2));
+	fiducialOrientationVector.beta = atan2(-1.0 * rotationMatrix(2, 0), sqrtf(pow(rotationMatrix(2, 1), 2) + pow(rotationMatric(2, 2), 2)));
+	fiducialOrientationVector.gamma = atan2(rotationMatrix(1, 0), rotationMatrix(0, 0));
 }
 
 
