@@ -37,12 +37,17 @@ void FiducialDetection::configure(std::string fileName)
 	detectorConfigured = true;
 }
 
-/* \fn FiducialDetector::extractFiducialOrientation()
+/* \fn FiducialDetector::extractFiducialOrientation(vnl_matrix<double>& rotationMatrix, vector<FiducialOrientation>& fiducialOrientationVector)
  * \brief Extracts (alpha, beta, gamma) from input rotation matrix. Computes axis-angle representation from rotation matrix. Compute alpha, beta, gamma from axis-angle representation.
- */
-void FiducialDetector::extractFiducialOrientation()
+ * \param [in] rotationMatrix the input rotation matrix returned by itkLabelGeometryFilter::GetRotationMatrix()
+ * \param [out] fiducialOrientationVector the output orientation vectors as required by training phase, for computing similarity matrix.
+*/
+void FiducialDetector::extractFiducialOrientationVector(vnl_matrix<double>& rotationMatrix , vector<FiducialOrientation>& fiducialOrientationVector)
 {
-	//TODO
+	// Reference: http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/
+	// Rotation matrix to Euler angle conversion
+	double x, y, z; 		
+	// TODO
 }
 
 
@@ -60,8 +65,6 @@ void FiducialDetection::generateTrainingData()
 
 	typedef itk::GDCMSeriesFileNames NamesGeneratorType;
 	NamesGeneratorType::Pointer nameGenerator = NamesGeneratorType::New();
-//	nameGenerator->SetUseSeriesDetails(true);
-//	nameGenerator->AddSeriesRestriction("0008|0021"); // means to refine based on series date
 	nameGenerator->SetGlobalWarningDisplay(false);
 	nameGenerator->SetDirectory(dirName);
 
@@ -104,26 +107,34 @@ void FiducialDetection::generateTrainingData()
 			reader->Update(); // read the series of DICOM images				
 			ImageType::Pointer ptr = reader->GetOutput(); // DICOM output, all files			
 			cout << "Number of files in this series: " << fileNames.size() << endl;
-				
-			itk::Index<3> id = {40, 3, 20};
-			signed short pixelValue = ptr->GetPixel(id);
-			cout << pixelValue << endl;
-	
-			// write fiducial orientations as the training data for the approach TODO
-			itkImageLabelGeometryFilter fiducialOrientationEstimator;
-			FiducialOrientation fiducialOrientVector; // represents collection of orientation of all fiducials in a label volume
-			vnl_matrix<double> fiducialRotationMatrix; 
-			for (unsigned int fileID = 0; fileID < nFilesInSeries; fileID++)				    	
-				// compute orientation of data 
-				for (size_t labelIndex = 0; labelIndex < labelID; labelIndex++) // for all available labels in any file
+			
+			size_t nFilesInSeries = fileNames.size();	
+			
+			// write fiducial orientations as the training data for the approach 
+			itkImageLabelGeometryFilter<ImageType> LabelGeometryFilter;
+			LabelGeometryFilter::Pointer fiducialOrientationEstimator = LabelGeometryFilter::New();
+
+			FiducialOrientation fiducialOrientVector; // represents the orientation of a fiducial
+			vnl_matrix<double> fiducialRotationMatrix; // represents the rotation matrix corresponding to a fiducial
+			
+			LabelGeometryImageFilterType::LabelsType::Iterator labelsIterator;
+			for (unsigned int fileID = 0; fileID < nFilesInSeries; fileID++) // for every label image file				    	
+			{
+				fiducialOrientationEstimator->SetInput(ptr[fileID]); // sets label image to be read
+				fiducialOrientationEstimator->Update(); // reads label image
+
+				cout << "Number of fiducials in this image: " << fiducialOrientationEstimator->GetNumberOfLabels() << endl;
+				size_t nLabelInImage = fiducialOrientationEstimator->GetNumberOfLabels();
+				for (size_t labelID = 0; labelID < nLabelsInImage; labelID++) 				
 				{
-					rotationMatrix = fiducialOrientationEstimator.GetRotationMatrix(label);//TODO value of the label representing fiducials
-					this->extractOrientation(rotationMatrix, fOrientVector); // 'fOrientVector' now contains orientation information for the fiducial
+					rotationMatrix = fiducialOrientationEstimator->GetRotationMatrix(labelID); // get rotation matrix
+					this->extractFiducialOrientationVector(rotationMatrix, fOrientVector); // 'fOrientVector' now contains orientation information for the fiducial
 					fiducialOrientationVectors.push(fOrientVector); // insert orientation triplet for this fiducial into a global training array.
 				}		
+			}
+		
 		}
 	}
-
 	catch (itk::ExceptionObject &ex)
 	{
 		cout << ex << endl;
