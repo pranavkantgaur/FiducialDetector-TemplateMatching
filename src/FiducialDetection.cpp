@@ -151,7 +151,7 @@ void FiducialDetection::run()
 	if (detectorConfigured == true)
 	{
 		generateTrainingData();
-		scts.generateFiducialTemplates(percentVariationEigenVectors);
+		scts.generateFiducialTemplates(percentVariationEigenVectors, clusterIDPerFiducial);
 /*		mmfs.generateFiducialCandidates(nGaussians);
 		itr.matchTemplatesWithCandidates(testDatasetDir;
 */	}

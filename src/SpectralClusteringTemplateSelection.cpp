@@ -1,47 +1,11 @@
 #include "SpectralClusteringTemplateSelection.h"
 
-void computeSimilarityMatrix()
-{
-	simMatrixSize = fiducialOrientationVectors.size();
-	similarityMatrix = new vector(simMatrixSize, vector<float>(simMatrixSize)>);
-	for (unsigned int row = 0; row < simMatrixSize; row++)
-		for (unsigned int col = 0; col < simMatrixSize; col++)
-		{
-			fiducialOneOrientationVector = fiducialOrientationVectors[row];
-			fiducialTwoOrientationVector = fiducialOrientationVectors[col];
-			similarityMatrix[row][col] = fabs(fiducialOneOrientationVector.alpha - fiducialTwoOrientatioVector.alpha) + fabs(fiducialOneOrientationVector.beta - fiducialTwoOrientatioVector.beta) + fabs(fiducialOneOrientationVector.gamma - fiducialTwoOrientationVector.gamma);		 
-		}
-}
-/*
-void computeKEigenVectors()
-{
-	// compute U matrix
-	// U =  first k eigen vectors of (D-1/2)W(D+1/2), D=diag(simMatrix)
-	vector<vector<float> > DMatrix;
-	DMatrix = similarityMatrix;
-	DMatrix.erase();
-	// zero out all elements except diagonals
-	unsigned int similarityMatrixSize = fiducialOrientationVectors.size();
-	for (unsigned int row = 0; row < similarityMatrixSize; row++)
-		for (unsigned int col = 0; col < similarityMatrixSize; col++)
-		{
-			if (row == col)
-				DMatrix[row][col] = similarityMatrix[row][col];
-		}
-	// D-1/2WD+1/2 TODO
-	Dmatrix
-}
-
-void computeKMeansClustering()
-{
-}
-*/
-
-
-/* void FiducialDetector::generateTemplates()
+/* void SpectralClusteringTemplateSelection::generateFiducialTemplates(float percentVariationEigenVectors, vector<int>& clusterIDPerFiducial)
  * \brief generates templates modeling fiducials from training data
+ * \param [in] percentVariationEigenVectors
+ * \param [out] clusterIDPerFiducial
 */
-void SpectralClusteringTemplateSelection::generateFiducialTemplates(float percentVariationEigenVectors)
+void SpectralClusteringTemplateSelection::generateFiducialTemplates(float percentVariationEigenVectors, vector<int>& clusterIDPerFiducial)
 {	
 	/* Approach:
 		spectral clustering in orientation space
@@ -49,9 +13,23 @@ void SpectralClusteringTemplateSelection::generateFiducialTemplates(float percen
  			compute first k eigenvectors , build matrix U
 			Perform k-means clustering on U 
 		return k-disjoint clusters */
-	computeSimilarityMatrix();
-/*	computeKEigenVectors();
-	computeKMeansClustering(); // returns disjoing clusters
-*/
-}
+
+	// compute affinity matrix
+	affMatrixSize = fiducialOrientationVectors.size();
+	affinityMatrix = new vector(affMatrixSize, vector<float>(affMatrixSize)>);
+	vector< FiducialOrientation > fiducialOneOrientationVector, fiducialTwoOrientationVector;
+	for (unsigned int row = 0; row < simMatrixSize; row++)
+		for (unsigned int col = 0; col < simMatrixSize; col++) // square matrix
+		{
+			fiducialOneOrientationVector.push(fiducialOrientationVectors[row]);
+			fiducialTwoOrientationVector.push(fiducialOrientationVectors[col]);
+			affinityMatrix[row][col] = fabs(fiducialOneOrientationVector.alpha - fiducialTwoOrientatioVector.alpha) + fabs(fiducialOneOrientationVector.beta - fiducialTwoOrientatioVector.beta) + fabs(fiducialOneOrientationVector.gamma - fiducialTwoOrientationVector.gamma);		 
+		}
+
+	// compute spectral clusters and return as output
+	itkAffinityClustering::Pointer affinityClustering = itkAffinityClustering::New();
+	affinityClustering->SetInput();
+	affinityClustering->Update(); // the computation step		
+	clustrerIDPerFiducial = affinityClustering->GetOutput(); // TODO: how to use percentVariationEigenVectors??
+}	
 

@@ -27,8 +27,7 @@ class FiducialDetection{
 			float beta;
 			float gamma;
 		};
-		std::vector<FiducialOrientation> fiducialOrientationVectors;			
-
+		vector<FiducialOrientation> fiducialOrientationVectors;				       vector<int> clusterIDPerFiducial; // the output of spectral clustering	
 		bool detectorConfigured;
 		std::string trainingDatasetDir;
 		std::string testDatasetDir;
