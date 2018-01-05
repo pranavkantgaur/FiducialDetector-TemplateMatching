@@ -9,6 +9,6 @@ class SpectralClusteringTemplateSelection{
 		std::vector<std::vector<float> > affinityMatrix;
 		unsigned int affinityMatrixSize;
 	public:
-		void generateFiducialTemplates(float, vector<int>);		
+		void generateFiducialTemplates(float, std::vector<int>&);		
 
 };
