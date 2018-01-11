@@ -11,8 +11,9 @@
 
 
 
-
+#include "Globals.h"
 #include "SpectralClusteringTemplateSelection.h"
+
 //#include "MAPMARCandidateSelection.h"
 //#include "ICPTemplateRegistration.h"
 
@@ -22,11 +23,6 @@ using namespace itk;
 class FiducialDetection{
 	
 	private:
-		struct FiducialOrientation{
-			float alpha;
-			float beta;
-			float gamma;
-		};
 		vector<FiducialOrientation> fiducialOrientationVectors;				       		Array<unsigned int> clusterIDPerFiducial; // the output of spectral clustering	
 		bool detectorConfigured;
 		std::string trainingDatasetDir;
