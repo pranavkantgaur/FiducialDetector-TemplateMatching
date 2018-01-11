@@ -148,8 +148,8 @@ void FiducialDetection::run()
 	if (detectorConfigured == true)
 	{
 		generateTrainingData();
-/*		scts.generateFiducialTemplates(percentVariationEigenVectors, clusterIDPerFiducial);
-		mmfs.generateFiducialCandidates(nGaussians);
+		scts.generateFiducialTemplates(percentVariationEigenVectors, fiducialOrientationVectors, clusterIDPerFiducial);
+/*		mmfs.generateFiducialCandidates(nGaussians);
 		itr.matchTemplatesWithCandidates(testDatasetDir;
 */	}
 	else
