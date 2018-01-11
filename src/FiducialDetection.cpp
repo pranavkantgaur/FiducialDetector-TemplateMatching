@@ -42,12 +42,12 @@ void FiducialDetection::configure(std::string fileName)
  * \param [in] rotationMatrix the input rotation matrix returned by itkLabelGeometryFilter::GetRotationMatrix()
  * \param [out] fiducialOrientationVector the output orientation vectors as required by training phase, for computing similarity matrix.
 */
-void FiducialDetector::extractFiducialOrientationVector(vnl_matrix<double>& rotationMatrix , vector<FiducialOrientation>& fiducialOrientationVector)
+void FiducialDetection::extractFiducialOrientationVector(vnl_matrix<double>& rotationMatrix , FiducialOrientation & fiducialOrientationVector)
 {
 	// Reference: http://nghiaho.com/?page_id=846 
 	// Rotation matrix to Euler angle conversion, assumed rotation sequence YXZ, a.k.a Yaw-Pitch-Roll
 	fiducialOrientationVector.alpha = atan2(rotationMatrix(2, 1), rotationMatrix(2, 2));
-	fiducialOrientationVector.beta = atan2(-1.0 * rotationMatrix(2, 0), sqrtf(pow(rotationMatrix(2, 1), 2) + pow(rotationMatric(2, 2), 2)));
+	fiducialOrientationVector.beta = atan2(-1.0 * rotationMatrix(2, 0), sqrtf(pow(rotationMatrix(2, 1), 2) + pow(rotationMatrix(2, 2), 2)));
 	fiducialOrientationVector.gamma = atan2(rotationMatrix(1, 0), rotationMatrix(0, 0));
 }
 
@@ -106,34 +106,31 @@ void FiducialDetection::generateTrainingData()
 			reader->SetImageIO(dicomIO);
 			reader->SetFileNames(fileNames);
 			reader->Update(); // read the series of DICOM images				
-			ImageType::Pointer ptr = reader->GetOutput(); // DICOM output, all files			
 			cout << "Number of files in this series: " << fileNames.size() << endl;
 			
 			size_t nFilesInSeries = fileNames.size();	
 			
 			// write fiducial orientations as the training data for the approach 
-			itkImageLabelGeometryFilter<ImageType> LabelGeometryFilter;
-			LabelGeometryFilter::Pointer fiducialOrientationEstimator = LabelGeometryFilter::New();
+			typedef LabelGeometryImageFilter<ImageType> LabelGeometryImageFilterType;
+			LabelGeometryImageFilterType::Pointer fiducialOrientationEstimator = LabelGeometryImageFilterType::New();
 
 			FiducialOrientation fiducialOrientVector; // represents the orientation of a fiducial
 			vnl_matrix<double> fiducialRotationMatrix; // represents the rotation matrix corresponding to a fiducial
 			
-			LabelGeometryImageFilterType::LabelsType::Iterator labelsIterator;
 			for (unsigned int fileID = 0; fileID < nFilesInSeries; fileID++) // for every label image file				    	
 			{
-				fiducialOrientationEstimator->SetInput(ptr[fileID]); // sets label image to be read
+				fiducialOrientationEstimator->SetInput(reader->GetOutput()); // sets the next label image to be read
 				fiducialOrientationEstimator->Update(); // reads label image
 
 				cout << "Number of fiducials in this image: " << fiducialOrientationEstimator->GetNumberOfLabels() << endl;
-				size_t nLabelInImage = fiducialOrientationEstimator->GetNumberOfLabels();
+				size_t nLabelsInImage = fiducialOrientationEstimator->GetNumberOfLabels();
 				for (size_t labelID = 0; labelID < nLabelsInImage; labelID++) 				
 				{
-					rotationMatrix = fiducialOrientationEstimator->GetRotationMatrix(labelID); // get rotation matrix
-					this->extractFiducialOrientationVector(rotationMatrix, fOrientVector); // 'fOrientVector' now contains orientation information for the fiducial
-					fiducialOrientationVectors.push(fOrientVector); // insert orientation triplet for this fiducial into a global training array.
+					fiducialRotationMatrix = fiducialOrientationEstimator->GetRotationMatrix(labelID); // get rotation matrix
+					this->extractFiducialOrientationVector(fiducialRotationMatrix, fiducialOrientVector); // 'fOrientVector' now contains orientation information for the fiducial
+					fiducialOrientationVectors.push_back(fiducialOrientVector); // insert orientation triplet for this fiducial into a global training array.
 				}		
 			}
-		
 		}
 	}
 	catch (itk::ExceptionObject &ex)
@@ -151,8 +148,8 @@ void FiducialDetection::run()
 	if (detectorConfigured == true)
 	{
 		generateTrainingData();
-		scts.generateFiducialTemplates(percentVariationEigenVectors, clusterIDPerFiducial);
-/*		mmfs.generateFiducialCandidates(nGaussians);
+/*		scts.generateFiducialTemplates(percentVariationEigenVectors, clusterIDPerFiducial);
+		mmfs.generateFiducialCandidates(nGaussians);
 		itr.matchTemplatesWithCandidates(testDatasetDir;
 */	}
 	else
