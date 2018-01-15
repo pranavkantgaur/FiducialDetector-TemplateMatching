@@ -25,14 +25,16 @@ void SpectralClusteringTemplateSelection::generateFiducialTemplates(float percen
 	typedef double AffinityMatrixValueType;
 	typedef itk::VariableSizeMatrix< AffinityMatrixValueType > AffinityMatrixType;
 	AffinityMatrixType affinityMatrix;
+	affinityMatrix.SetSize(affMatrixSize, affMatrixSize);
 
+	
 	FiducialOrientation fiducialOneOrientationVector, fiducialTwoOrientationVector;
 	for (unsigned int row = 0; row < affMatrixSize; row++)
 		for (unsigned int col = 0; col < affMatrixSize; col++) // square matrix
 		{
 			fiducialOneOrientationVector = fiducialOrientationVectors[row];
 			fiducialTwoOrientationVector = fiducialOrientationVectors[col];
-			affinityMatrix[row][col] = fabs(fiducialOneOrientationVector.alpha - fiducialTwoOrientationVector.alpha) + fabs(fiducialOneOrientationVector.beta - fiducialTwoOrientationVector.beta) + fabs(fiducialOneOrientationVector.gamma - fiducialTwoOrientationVector.gamma);		 
+			affinityMatrix(row, col) = fabs(fiducialOneOrientationVector.alpha - fiducialTwoOrientationVector.alpha) + fabs(fiducialOneOrientationVector.beta - fiducialTwoOrientationVector.beta) + fabs(fiducialOneOrientationVector.gamma - fiducialTwoOrientationVector.gamma);		 
 		}
 
 	// compute spectral clusters and return as output
