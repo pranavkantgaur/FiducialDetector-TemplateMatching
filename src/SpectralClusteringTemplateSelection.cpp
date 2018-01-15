@@ -17,8 +17,15 @@ void SpectralClusteringTemplateSelection::generateFiducialTemplates(float percen
 
 	// compute affinity matrix
 	unsigned int affMatrixSize = fiducialOrientationVectors.size();
-	typedef std::vector<std::vector<float> > Matrix;
+/*	typedef std::vector<std::vector<float> > Matrix;
 	Matrix affinityMatrix(affMatrixSize, std::vector<float>(affMatrixSize));
+*/
+	typedef itk::AffinityClustering AffinityClusteringFilterType;
+	AffinityClusteringFilterType::Pointer affinityClusteringFilter = AffinityClusteringFilterType::New();
+	typedef double AffinityMatrixValueType;
+	typedef itk::VariableSizeMatrix< AffinityMatrixValueType > AffinityMatrixType;
+	AffinityMatrixType affinityMatrix;
+
 	FiducialOrientation fiducialOneOrientationVector, fiducialTwoOrientationVector;
 	for (unsigned int row = 0; row < affMatrixSize; row++)
 		for (unsigned int col = 0; col < affMatrixSize; col++) // square matrix
@@ -29,12 +36,7 @@ void SpectralClusteringTemplateSelection::generateFiducialTemplates(float percen
 		}
 
 	// compute spectral clusters and return as output
-	typedef itk::AffinityClustering AffinityClusteringFilterType;
-	AffinityClusteringFilterType::Pointer affinityClusteringFilter = AffinityClusteringFilterType::New();
-	typedef double AffinityMatrixValueType;
-	typedef itk::VariableSizeMatrix< AffinityMatrixValueType > AffinityMatrixType;
-	AffinityMatrixType affMat;
-	affinityClusteringFilter->SetInput(affMat);
+	affinityClusteringFilter->SetInput(affinityMatrix);
 	affinityClusteringFilter->Update(); // the computation step		
 	clusterIDPerFiducial = affinityClusteringFilter->GetOutputClusters(); // for every fiducial , we get the cluster id
 	// TODO: how to use percentVariationEigenVectors??
