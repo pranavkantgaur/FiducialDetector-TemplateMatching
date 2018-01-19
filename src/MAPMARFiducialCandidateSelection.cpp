@@ -1,7 +1,9 @@
 /* void FiducialDetector::generateFiducialCandidates()
  * \brief Generates most probable candidates modeling fiducials, combines Gaussian mixture modeling with Markov random field
  */
-void FiducialDetector::generateFiducialCandidates()
+#include "MAPMARFiducialCandidateSelection.h"
+
+void MAPMARFiducialCandidateSelection::generateFiducialCandidates(size_t nGaussians)
 {
 	// Perform unit variance and zero mean normalization of test data
 	// Perform k-means clustering of test data to get initial class neabs for k Gaussian distributions

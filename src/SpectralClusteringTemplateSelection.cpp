@@ -41,9 +41,9 @@ void SpectralClusteringTemplateSelection::generateFiducialTemplates(float percen
 	affinityClusteringFilter->SetInput(affinityMatrix);
 	affinityClusteringFilter->Update(); // the computation step		
 	clusterIDPerFiducial = affinityClusteringFilter->GetOutputClusters(); // for every fiducial , we get the cluster id
-	// TODO: how to use percentVariationEigenVectors??
+	// TODO: how to use percentVariationEigenVectors??		
 	// there is no control how to discard clusters based on percentage confidence
+	// TODO: identify leader fiducial to act as a template for next stage
 	std::cout << "Number of fiducial template clusters: " << affinityClusteringFilter->GetNumberOfClusters() << std::endl;
-	
 }	
 

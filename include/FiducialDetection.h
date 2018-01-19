@@ -13,8 +13,8 @@
 
 #include "Globals.h"
 #include "SpectralClusteringTemplateSelection.h"
+#include "MAPMARFiducialCandidateSelection.h"
 
-//#include "MAPMARCandidateSelection.h"
 //#include "ICPTemplateRegistration.h"
 
 using namespace std;
@@ -30,8 +30,8 @@ class FiducialDetection{
 		size_t nGaussians;
 		float percentVariationEigenVectors;
 		SpectralClusteringTemplateSelection scts;
-/*		MAPMARFiducialCandidateSelection mmfcs;
-		ICPTemplateRegistration itr;
+		MAPMARFiducialCandidateSelection mmfcs;
+/*		ICPTemplateRegistration itr;
 		*/
 		void generateTrainingData();
 		void extractFiducialOrientationVector(vnl_matrix<double>&, FiducialOrientation &);
