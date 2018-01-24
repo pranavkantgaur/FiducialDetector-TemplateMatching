@@ -1,5 +1,74 @@
 #include "FiducialDetection.h"
 
+std::string FiducialDetection::getTrainingDatasetDir() {
+	return this->trainingDatasetDir;
+}
+
+
+
+/*! \fn FiducialDetection::getTestDatasetDir()
+ *  \brief Returns the location of input test data directory.
+ *  \return std::string Representing the location of input test data directory
+ */
+std::string FiducialDetection::getTestDatasetDir() {
+	return this->testDatasetDir;
+}
+
+/*! \fn FiducialDetection::getPercentVariationEigenVector()
+ *  \brief Returns percentage of variation that must be captured by the selected Eigen vectors(fixes 'k' in k-way clustering)
+ *  \return float Percente variation that must be captured by the Eigen vectors selected for Fiducial candidate selection.
+ */
+float FiducialDetection::getPercentVariationEigenVector(){
+	return this->percentVariationEigenVector;
+}
+
+/*! \fn FiducialDetection::getNumberOfGaussians()
+ *  \brief Returns number of Gaussians for Fiducial candidate selection stage.
+ *  \param [in] inputTrainingDatasetDir input directory
+ *  \return size_t Number of Gaussians for Fiducial candidate selection
+ */
+size_t FiducialDetection::getNumberOfGaussians(){
+	return this->nGaussians;	
+}
+
+
+/*! \fn FiducialDetection::setTrainingDatasetDir(std::string inputTrainingDatasetDir)
+ *  \brief sets directory for input training data
+ *  \param [in] inputTrainingDatasetDir input directory
+ *  \return void
+ */
+void FiducialDetection::setTrainingDatasetDir(std::string inputTrainingDatasetDir) {
+	this->trainingDatasetDir = inputTrainingDatasetDir;
+}
+
+/*! \fn FiducialDetection::setTestDatasetDir(std::string inputTestDatasetDir)
+ *  \brief sets test dataset directory
+ *  \param [in] Input test directory location
+ *  \return void
+*/
+void FiducialDetection::setTestDatasetDir(std::string inputTestDatasetDir) {
+	this->testDatasetDir = inputTestDatasetDir;
+}
+
+
+/*! \fn FiducialDetection:setPercentVariationEigenVector(float inputPercentVariationEigenVector)
+ *  \brief Sets percentatge variation for Eigen vector
+ * \param [in] inputPercentVariationEigenVector Input percent variation for Eigen value based clustering.
+*   \return void
+*/
+void FiducialDetection::setPercentageVariationEigenVector(float inputPercentVariationEigenVector){
+	this->percentVariationEigenVector = inputPercentVariationEigenVector;
+}
+
+/*! \fn FiducialDetection:setNumberOfGaussians(size_t inputNumberOfGaussians)
+ * \brief Sets number of Gaussians for fiducial candidate selection.
+ * \param [in] inputNumberOfGaussians Number of Gaussians
+*/
+void FiducialDetection::setNumberOfGaussians(size_t inputNumberOfGaussians) {
+	this->nGaussians = inputNumberOfGaussians;
+}
+
+
 
 /* void FiducialDetector::configure()
  *  \brief Reads project configuration file and initializes internal parameters.
@@ -17,21 +86,21 @@ void FiducialDetection::configure(std::string fileName)
 	itk::DOMNode::Pointer trainingDatasetDirDOMNode = output_dom_object->Find("training_dataset_dir"); 
 	itk::DOMTextNode::Pointer textNodePtr = trainingDatasetDirDOMNode->GetTextChild();
 	
-	trainingDatasetDir = textNodePtr->GetText();
+	this->setTrainDatasetDir(textNodePtr->GetText());
 	// dir location for test images
 	itk::DOMNode::Pointer testingDatasetDirDOMNode = output_dom_object->Find("test_dataset_dir");
 	textNodePtr = testingDatasetDirDOMNode->GetTextChild();
-	testDatasetDir = textNodePtr->GetText();
+	this->setTestDatasetDir(textNodePtr->GetText());
 
 	 // % of variation as a therehold for selecting k 
 	itk::DOMNode::Pointer percentVariationEigenVectorsDOMNode = output_dom_object->Find("percent_variation_eigen_vectors");
  	textNodePtr = percentVariationEigenVectorsDOMNode->GetTextChild();
-	percentVariationEigenVectors = stof(textNodePtr->GetText());
+	this->setPercentVariationEigenVector(stof(textNodePtr->GetText()));
 	
 	// number of gaussian distributions
 	itk::DOMNode::Pointer nGaussiansDOMNode = output_dom_object->Find("nGaussians");
 	textNodePtr = nGaussiansDOMNode->GetTextChild();
-	nGaussians = stoi(textNodePtr->GetText());
+	this->setNumberOfGaussians(stoi(textNodePtr->GetText()));
 		
 	// parameters for icp template registration parameters
 	detectorConfigured = true;
@@ -137,6 +206,89 @@ void FiducialDetection::generateTrainingData()
 	{
 		cout << ex << endl;
 	}				
+}
+
+
+
+
+
+/* void SpectralClusteringTemplateSelection::generateFiducialTemplates(float percentVariationEigenVectors, vector<int>& clusterIDPerFiducial)
+ * \brief generates templates modeling fiducials from training data
+ * \param [in] percentVariationEigenVectors
+ * \param [out] clusterIDPerFiducial
+*/
+void FiducialDetection::generateFiducialTemplates(float percentVariationEigenVectors, std::vector<FiducialOrientation>& fiducialOrientationVectors, itk::Array<unsigned int>& clusterIDPerFiducial)
+{	
+	/* Approach:
+		spectral clustering in orientation space
+			compute similarity matrix between contoured fiducials over their orientations
+ 			compute first k eigenvectors , build matrix U
+			Perform k-means clustering on U 
+		return k-disjoint clusters */
+
+	// compute affinity matrix
+	unsigned int affMatrixSize = fiducialOrientationVectors.size();
+/*	typedef std::vector<std::vector<float> > Matrix;
+	Matrix affinityMatrix(affMatrixSize, std::vector<float>(affMatrixSize));
+*/
+	typedef itk::AffinityClustering AffinityClusteringFilterType;
+	AffinityClusteringFilterType::Pointer affinityClusteringFilter = AffinityClusteringFilterType::New();
+	typedef double AffinityMatrixValueType;
+	typedef itk::VariableSizeMatrix< AffinityMatrixValueType > AffinityMatrixType;
+	AffinityMatrixType affinityMatrix;
+	affinityMatrix.SetSize(affMatrixSize, affMatrixSize);
+
+	
+	FiducialOrientation fiducialOneOrientationVector, fiducialTwoOrientationVector;
+	for (unsigned int row = 0; row < affMatrixSize; row++)
+		for (unsigned int col = 0; col < affMatrixSize; col++) // square matrix
+		{
+			fiducialOneOrientationVector = fiducialOrientationVectors[row];
+			fiducialTwoOrientationVector = fiducialOrientationVectors[col];
+			affinityMatrix(row, col) = fabs(fiducialOneOrientationVector.alpha - fiducialTwoOrientationVector.alpha) + fabs(fiducialOneOrientationVector.beta - fiducialTwoOrientationVector.beta) + fabs(fiducialOneOrientationVector.gamma - fiducialTwoOrientationVector.gamma);		 
+		}
+
+	// compute spectral clusters and return as output
+	affinityClusteringFilter->SetInput(affinityMatrix);
+	affinityClusteringFilter->Update(); // the computation step		
+	clusterIDPerFiducial = affinityClusteringFilter->GetOutputClusters(); // for every fiducial , we get the cluster id
+	// TODO: how to use percentVariationEigenVectors??		
+	// there is no control how to discard clusters based on percentage confidence
+	// TODO: identify leader fiducial to act as a template for next stage
+	std::cout << "Number of fiducial template clusters: " << affinityClusteringFilter->GetNumberOfClusters() << std::endl;
+}	
+
+
+/* void FiducialDetector::generateFiducialCandidates()
+ * \brief Generates most probable candidates modeling fiducials, combines Gaussian mixture modeling with Markov random field
+ */
+#include "MAPMARFiducialCandidateSelection.h"
+
+void MAPMARFiducialCandidateSelection::generateFiducialCandidates(size_t nGaussians)
+{
+	// Perform unit variance and zero mean normalization of test data
+	// Perform k-means clustering of test data to get initial class neabs for k Gaussian distributions
+	// EM-based clustering is used to determine the likelihood of a voxel belonging to a Gauissian distribution
+	// A MAP estimate of the likelihood is used to assign a label to the voxel
+	// Means of Gaussian distributions are sorted in ascending order, Gold fdcials are obtained 'consistently' in one Gaussian distribution
+	// To assign spatial context, Markovian model is enforced , ensuring voxels with same neighborhood labels and similar likelihoods are clustered together
+	// Generate distinct voxel labels from previous MRF step by combining voxels that are connected in a 3X3X3 voxel neighborhood
+	
+	// Discard false positives:
+		// learn Gaussian volume space from training data
+		// if volume of a candidate falls outside threshold, discard
+}
+
+
+/* void FiducialDetector::matchTemplatesWithCandidates()
+ * \brief Matches fiducial candidates against templates
+ */
+void FiducialDetector::matchTemplatesWithCandidates()
+{
+	// Compares all prospective fiducial candidates 
+		// convert fiducial candiates and templates into 3D volumes using Marching cube before registering with ICP
+		// ICP minimizes the pose variations of the fiducial marker candidates with respect to templates
+		// Assumption: Gold fiducial marker candidate will be similar to aleast one of the templates after rigid registration
 }
 
 
