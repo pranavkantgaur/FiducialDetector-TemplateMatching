@@ -13,49 +13,55 @@
 
 #include <itkArray.h>
 #include <itkAffinityClustering.h>
-#include "Globals.h"
 
 using namespace std;
 using namespace itk;
 
+/*! \struct FiducialOrientation
+ * \brief Represents the orientation vector for a fiducial.
+ */
 struct FiducialOrientation {
 	float alpha;
 	float beta;
 	float gamma;
 };
 
-class FiducialDetection{
+/*! \class FiducialDetection
+ * \brief The class modelling the concept of fiducial detector.
+ */
+class FiducialDetection {
 	
 	private:
-		vector<FiducialOrientation> fiducialOrientationVectors;	
-		Array<unsigned int> clusterIDPerFiducial; // the output of spectral clustering	
-		bool detectorConfigured;
-		std::string trainingDatasetDir;
-		std::string testDatasetDir;
-		size_t nGaussians;
-		float percentVariationEigenVectors;
-		SpectralClusteringTemplateSelection scts;
-		MAPMARFiducialCandidateSelection mmfcs;
-/*		ICPTemplateRegistration itr;
-		*/
-		void generateTrainingData();
-		void extractFiducialOrientationVector(vnl_matrix<double>&, FiducialOrientation &);
-		std::string getTrainingDir();
-		std::string getTestDir();
-		float getPercentVariationEigenVector();
-		size_t getNumberOfGaussians();
-		void setTrainingDir();
-		void setTestDir();
-		void setPercentageVariationEigenVector();
-		void setNumberOfGaussians();
+		vector<FiducialOrientation> fiducial_orientation_vectors_;	
+		Array<unsigned int> cluster_id_per_fiducial_; // the output of spectral clustering	
+		bool detector_configured_;
+		std::string training_dataset_dir_;
+		std::string test_dataset_dir_;
+		size_t n_gaussians_;
+		float percent_variation_eigen_vectors_;
 
-		void generateFiducialTemplates(float, std::vector<FiducialOrientation>&, itk::Array<unsigned int>&);	
+		void GenerateTrainingData();
+		void ExtractFiducialOrientationVector(vnl_matrix<double>&, FiducialOrientation &);
+		void GenerateFiducialTemplates(float, std::vector<FiducialOrientation>&, itk::Array<unsigned int>&);	
 		
-		void generateFiducialCandidates(size_t nGaussians);
+		void GenerateFiducialCandidates(size_t);
+		void MatchTemplatesWithCandidates();
 
 	public:
-		void configure(std::string); 
-		void run();
+		// Getters
+		string GetTrainingDatasetDir();
+		string GetTestDatasetDir();
+		size_t GetNumberOfGaussians();
+		float GetPercentVariationCoveredByEigenVectors(); 	
+
+		// Setters
+		void SetTrainingDatasetDir(string);
+		void GetTestDatasetDir(string);
+		void GetNumberOfGaussians(size_t);
+		void GetPercentVariationCoveredByEigenVectors(float); 	
+
+		void Configure(std::string); /*!< Initializes the system, with configuration read from a system configuration file(assumes XML)*/ 
+		void Run(); /*!< Orchestrates the fiducial detection process.*/
 };
 
 
