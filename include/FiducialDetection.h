@@ -1,3 +1,6 @@
+#ifndef INCLUDE_FIDUCIALDETECTION_H
+#define INCLUDE_FIDUCIALDETECTION_H
+
 #include <stdlib.h>
 #include <string>
 #include <vector>
@@ -63,5 +66,4 @@ class FiducialDetection {
 		void Configure(std::string); /*!< Initializes the system, with configuration read from a system configuration file(assumes XML)*/ 
 		void Run(); /*!< Orchestrates the fiducial detection process.*/
 };
-
-
+#endif
